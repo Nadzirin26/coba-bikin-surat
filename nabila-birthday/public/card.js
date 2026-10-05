@@ -2,27 +2,35 @@ const root = document.querySelector('#root');
 let data, countdownInterval, retryTimer;
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const banner = () => data?.admin ? '<p class="preview-banner">Pratinjau pribadi · <a href="/admin">Edit kartu</a></p>' : '';
+const bouquet = () => '<div class="bouquet" aria-hidden="true"><span class="stem flower-one"><i>🌸</i></span><span class="stem flower-two"><i>🌼</i></span><span class="stem flower-three"><i>🌷</i></span><span class="stem flower-four"><i>🌸</i></span><span class="stem flower-five"><i>🌼</i></span><span class="bouquet-wrap"></span><span class="bouquet-ribbon">♡</span></div>';
 function confetti() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for (let i = 0; i < 42; i++) {
     const bit = document.createElement('i'); bit.className = 'confetti';
+    bit.setAttribute('aria-hidden', 'true');
+    bit.textContent = ['♡', '🌸', '✿', '🌼'][i % 4];
     bit.style.left = `${Math.random()*100}%`; bit.style.animationDelay = `${Math.random()}s`;
-    bit.style.background = ['#bd7484','#e7baa2','#c7a46c'][i%3];
+    bit.style.color = ['#bd7484','#e7baa2','#c7a46c'][i%3];
     document.body.append(bit); setTimeout(() => bit.remove(), 4500);
   }
 }
 function show(step = 0) {
   const c = data.card;
   if (step === 0) {
-    root.innerHTML = banner() + `<section><p class="eyebrow">10 OKTOBER 2026 · HARI ISTIMEWAMU</p><h1>Untuk ${escape(c.name)},<br>dengan cinta.</h1><p class="muted">Ada sesuatu yang ingin aku sampaikan.<br>Dan hari ini, waktunya kamu membukanya.</p><div class="envelope" aria-hidden="true"></div><button id="next">Buka kejutanmu ♡</button></section>`;
+    root.innerHTML = banner() + `<section><p class="eyebrow">10 OKTOBER 2026 · SPECIAL DELIVERY</p><span class="sticker">buat kamu yang hari ini ulang tahun ♡</span><h1>Halo, ${escape(c.name)}!<br><em>Ada paket kecil.</em></h1><p class="muted">Isinya bunga, doa baik, dan sedikit keisengan.<br>Boleh dibuka. Nggak ada tagihan kok. 🤭</p>${bouquet()}<button id="next">Buka dulu, penasaran kan? 💌</button><p class="tiny-note">100% bebas ongkir · 200% niat bikinnya</p></section>`;
   } else if (step === 1) {
-    root.innerHTML = banner() + `<section><p class="eyebrow">HARI INI TENTANG KAMU</p><div class="seal" aria-hidden="true">♡</div><h1>${escape(c.title)}</h1><p class="letter">${escape(c.intro)}</p><button id="next">Ada surat untukmu →</button></section>`;
+    root.innerHTML = banner() + `<section class="paper birthday-note"><p class="eyebrow">HARI INI KAMU TOKOH UTAMANYA</p><div class="cake" aria-hidden="true">🎂</div><h1>${escape(c.title)}</h1><p class="letter centered">${escape(c.intro)}</p><span class="sticker">level baru unlocked ✨</span><p class="muted">Oke, sekarang ada sedikit tulisan.<br>Tenang, bukan tugas kuliah.</p><button id="next">Baca surat kecilnya 💌</button></section>`;
     confetti();
   } else if (step === 2) {
-    root.innerHTML = banner() + `<section class="paper"><p class="eyebrow">SURAT KECIL, RASA YANG BESAR</p><h2>Sayang, ${escape(c.name)}.</h2><p class="letter">${escape(c.message)}</p><p class="signature">${escape(c.sender)}</p><button id="next">Satu doa lagi ♡</button></section>`;
+    root.innerHTML = banner() + `<section class="paper letter-paper"><div class="letter-flowers" aria-hidden="true">🌷 🌸 🌼</div><p class="eyebrow">SEBUAH SURAT KECIL UNTUKMU</p><h2>Dear ${escape(c.name)}, ♡</h2><p class="letter">${escape(c.message)}</p><p class="signature">${escape(c.sender)}</p><button id="next">Masih ada bunga buatmu 🌷</button></section>`;
   } else {
-    root.innerHTML = banner() + `<section><p class="eyebrow">UNTUK SEMUA HARI YANG AKAN DATANG</p><div class="seal" aria-hidden="true">✧</div><h1>Make a wish,<br>${escape(c.name)}.</h1><p class="letter">${escape(c.wish)}</p><p class="signature">${escape(c.sender)} ♡</p><button id="again">Baca lagi ↻</button></section>`;
+    root.innerHTML = banner() + `<section><p class="eyebrow">SEDIKIT BUNGA, BANYAK DOA BAIK</p>${bouquet()}<h1>Make a wish,<br><em>${escape(c.name)}.</em></h1><p class="letter centered">${escape(c.wish)}</p><button id="bloom">Terima bunganya 🌸</button><p id="bloom-message" class="muted bloom-message" role="status"></p><p class="signature">${escape(c.sender)}</p><button class="secondary" id="again">Baca lagi ↻</button></section>`;
     confetti(); document.querySelector('#again').onclick = () => show(0);
+    document.querySelector('#bloom').onclick = () => {
+      confetti(); document.querySelector('.bouquet').classList.add('bloomed');
+      document.querySelector('#bloom-message').textContent = 'Bunga berhasil diterima! Sekarang senyum dulu, biar bunganya nggak minder. 🤭♡';
+      document.querySelector('#bloom').textContent = 'Tambah bunga lagi? 🌼';
+    };
   }
   const next = document.querySelector('#next'); if (next) next.onclick = () => { show(step+1); window.scrollTo({top:0,behavior:'smooth'}); };
 }
