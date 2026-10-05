@@ -1,7 +1,8 @@
 const root = document.querySelector('#root');
 let data, countdownInterval, retryTimer;
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const banner = () => data?.admin ? '<p class="preview-banner">Pratinjau pribadi · <a href="/admin">Edit kartu</a></p>' : '';
+const recipientView = new URLSearchParams(location.search).get('view') === 'recipient';
+const banner = () => data?.admin && !recipientView ? '<p class="preview-banner">Pratinjau pribadi · <a href="/?view=recipient">POV Nabila</a> · <a href="/admin">Edit kartu</a></p>' : '';
 const bouquet = () => '<div class="bouquet" aria-hidden="true"><span class="stem flower-one"><i>🌸</i></span><span class="stem flower-two"><i>🌼</i></span><span class="stem flower-three"><i>🌷</i></span><span class="stem flower-four"><i>🌸</i></span><span class="stem flower-five"><i>🌼</i></span><span class="bouquet-wrap"></span><span class="bouquet-ribbon">♡</span></div>';
 function confetti() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -9,7 +10,7 @@ function confetti() {
     const bit = document.createElement('i'); bit.className = 'confetti';
     bit.setAttribute('aria-hidden', 'true');
     bit.textContent = ['♡', '🌸', '✿', '🌼'][i % 4];
-    bit.style.left = `${Math.random()*100}%`; bit.style.animationDelay = `${Math.random()}s`;
+    bit.style.setProperty('--fall-x', `${Math.random()*100}%`); bit.style.animationDelay = `${Math.random()}s`;
     bit.style.color = ['#bd7484','#e7baa2','#c7a46c'][i%3];
     document.body.append(bit); setTimeout(() => bit.remove(), 4500);
   }
