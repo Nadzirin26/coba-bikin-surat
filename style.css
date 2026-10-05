@@ -1,0 +1,293 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --rose-gold: #b76e79;
+    --soft-pink: #f8c8dc;
+    --text-color: #4a4a4a;
+    --shadow: 0 15px 35px rgba(183, 110, 121, 0.15);
+    --border: rgba(183, 110, 121, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+/* Subtle Sparkles Background */
+#sparkles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sparkle {
+    position: absolute;
+    background: var(--rose-gold);
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle-fade infinite alternate;
+}
+
+@keyframes twinkle-fade {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 0.5; transform: scale(1.2); box-shadow: 0 0 8px var(--rose-gold); }
+    100% { opacity: 0; transform: scale(0.5); }
+}
+
+.container {
+    width: 100%;
+    max-width: 550px;
+    padding: 20px;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Pages */
+.page {
+    position: absolute;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(30px) scale(0.95);
+    z-index: 0;
+}
+
+.page.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    z-index: 10;
+}
+
+/* Typography */
+h1.elegant-title {
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-gold);
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(183, 110, 121, 0.15);
+}
+
+.subtitle {
+    color: #7a7a7a;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 50px;
+    line-height: 1.5;
+}
+
+/* Gift Box CSS Art (Feminine Theme) */
+.gift-box {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    animation: gentle-float 3s infinite ease-in-out;
+}
+
+.gift-box:hover {
+    transform: scale(1.05);
+    animation: none;
+}
+
+.box {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    background: var(--soft-pink);
+    border-radius: 12px;
+    box-shadow: inset -10px -10px 0 rgba(0,0,0,0.05), 0 10px 25px rgba(183,110,121,0.2);
+    border: 2px solid white;
+}
+
+.lid {
+    position: absolute;
+    top: 5px;
+    left: -10px;
+    width: 170px;
+    height: 35px;
+    background: var(--rose-gold);
+    border-radius: 8px;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.05);
+    z-index: 2;
+    transition: transform 0.5s ease;
+    border: 2px solid white;
+}
+
+.ribbon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 100%;
+    background: white;
+    z-index: 1;
+}
+
+.ribbon-bow {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 45px;
+    background: white;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+    z-index: 3;
+}
+
+.gift-box.open .lid {
+    transform: translateY(-60px) rotate(-15deg);
+    opacity: 0;
+}
+.gift-box.open {
+    transform: scale(1.2);
+    opacity: 0;
+    transition: all 0.7s ease;
+}
+
+@keyframes gentle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+
+/* Card Styles */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 35px 25px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    border: 2px solid white;
+}
+
+.card-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--rose-gold);
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+    padding-bottom: 10px;
+}
+
+.card-image-container {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 4px solid white;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+}
+
+.elegant-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.elegant-img:hover {
+    transform: scale(1.04);
+}
+
+.card-body .greeting {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: var(--rose-gold);
+}
+
+.card-body .message {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #555;
+    font-weight: 600;
+}
+
+.btn {
+    background: white;
+    color: var(--rose-gold);
+    border: 2px solid var(--rose-gold);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Quicksand', sans-serif;
+    display: inline-block;
+}
+
+.btn:hover {
+    background: var(--rose-gold);
+    color: white;
+    box-shadow: 0 8px 20px rgba(183, 110, 121, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* Button Container for Interactive Joke */
+.double-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    height: 125px;
+    align-items: center;
+    justify-content: center;
+}
+
+.double-buttons .btn {
+    width: 85%;
+    font-size: 1rem;
+}
+
+#runaway-btn {
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#stay-btn {
+    position: absolute;
+    bottom: 0;
+}
