@@ -1,6 +1,8 @@
 # Kartu ulang tahun Nabila
 
-Kartu interaktif: amplop → ucapan → surat → doa. Akses publik terkunci hingga **10 Oktober 2026 pukul 00.00 WIB**, lalu tetap terbuka. Server tidak mengirim isi surat sebelum waktunya. `/admin` menyediakan login, editor dan pratinjau dengan sesi 8 jam.
+Kartu interaktif: buket → ucapan → surat → album enam foto → doa dan bunga. Akses publik terkunci hingga **10 Oktober 2026 pukul 00.00 WIB**, lalu tetap terbuka. Server tidak mengirim isi surat sebelum waktunya. `/admin` menyediakan login, editor dan pratinjau dengan sesi 8 jam.
+
+Foto asli berada di `private/photos`, bukan output statis. `/api/photo?id=1` hingga `6` mengikuti penguncian tanggal dan sesi admin. Bingkai scrapbook dan crop screenshot dibuat lewat CSS. Foto disertakan di repo sesuai permintaan push proyek; jika repo GitHub publik, berkas foto di repo dapat dilihat publik meskipun akses website masih terkunci.
 
 ## Menjalankan lokal
 

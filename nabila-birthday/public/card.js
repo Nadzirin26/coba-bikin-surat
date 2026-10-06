@@ -4,6 +4,8 @@ const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<'
 const recipientView = new URLSearchParams(location.search).get('view') === 'recipient';
 const banner = () => data?.admin && !recipientView ? '<p class="preview-banner">Pratinjau pribadi · <a href="/?view=recipient">POV Nabila</a> · <a href="/admin">Edit kartu</a></p>' : '';
 const bouquet = () => '<div class="bouquet" aria-hidden="true"><span class="stem flower-one"><i>🌸</i></span><span class="stem flower-two"><i>🌼</i></span><span class="stem flower-three"><i>🌷</i></span><span class="stem flower-four"><i>🌸</i></span><span class="stem flower-five"><i>🌼</i></span><span class="bouquet-wrap"></span><span class="bouquet-ribbon">♡</span></div>';
+const photoCaptions = ['senyum dulu, bunganya lihat nih ♡', 'empat pose, tetap gemes semua 🤭', 'tim beruang juga ikut ngucapin 🧸', 'bunga kuning & hari yang manis 🌼', 'sibuk sebentar, cute-nya tetap jalan ✨', 'bunganya banyak, tokoh utamanya satu 🌷'];
+const album = () => `<div class="photo-grid">${photoCaptions.map((caption,i) => `<figure class="polaroid photo-${i+1}"><span class="photo-tape" aria-hidden="true"></span><div class="photo-window ${i===1||i===2 ? 'screenshot-photo' : ''}"><img src="/api/photo?id=${i+1}" alt="Foto Nabila ${i+1}" loading="lazy" decoding="async" width="490" height="712"></div><figcaption>${caption}</figcaption><span class="photo-flower" aria-hidden="true">${['🌸','♡','🌼','🌷','♡','🌸'][i]}</span></figure>`).join('')}</div>`;
 function confetti() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for (let i = 0; i < 42; i++) {
@@ -24,6 +26,8 @@ function show(step = 0) {
     confetti();
   } else if (step === 2) {
     root.innerHTML = banner() + `<section class="paper letter-paper"><div class="letter-flowers" aria-hidden="true">🌷 🌸 🌼</div><p class="eyebrow">SEBUAH SURAT KECIL UNTUKMU</p><h2>Dear ${escape(c.name)}, ♡</h2><p class="letter">${escape(c.message)}</p><p class="signature">${escape(c.sender)}</p><button id="next">Masih ada bunga buatmu 🌷</button></section>`;
+  } else if (step === 3) {
+    root.innerHTML = banner() + `<section class="scrapbook"><p class="eyebrow">SOME LITTLE THINGS ABOUT YOU</p><span class="sticker">bukti kalau kamu & bunga itu satu tema ♡</span><h1>Enam foto,<br><em>banyak senyum.</em></h1><p class="muted">Album kecil buat tokoh utama hari ini.<br>Geser ke bawah, ada versi gemesnya juga. 🤭</p>${album()}<p class="album-note">PS: bunga boleh layu, foto-foto ini jangan. 🌷</p><button id="next">Sekarang, bunga buatmu 🌸</button></section>`;
   } else {
     root.innerHTML = banner() + `<section><p class="eyebrow">SEDIKIT BUNGA, BANYAK DOA BAIK</p>${bouquet()}<h1>Make a wish,<br><em>${escape(c.name)}.</em></h1><p class="letter centered">${escape(c.wish)}</p><button id="bloom">Terima bunganya 🌸</button><p id="bloom-message" class="muted bloom-message" role="status"></p><p class="signature">${escape(c.sender)}</p><button class="secondary" id="again">Baca lagi ↻</button></section>`;
     confetti(); document.querySelector('#again').onclick = () => show(0);
