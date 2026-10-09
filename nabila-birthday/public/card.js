@@ -1,5 +1,27 @@
 const root = document.querySelector('#root');
 let data, countdownInterval, retryTimer;
+let soundtrack;
+function startMusic() {
+  if (!soundtrack) {
+    soundtrack = new Audio('/api/music');
+    soundtrack.loop = true; soundtrack.volume = 0.35; soundtrack.preload = 'none';
+    const controls = document.createElement('div'); controls.className = 'music-controls';
+    controls.innerHTML = '<span>♫ From The Start · Good Kid</span><button type="button" id="music-toggle" aria-label="Putar musik">Putar lagu ♫</button><span id="music-status" class="music-status" role="status"></span>';
+    document.body.append(controls);
+    const toggle = controls.querySelector('button');
+    const update = () => { toggle.textContent = soundtrack.paused ? 'Putar lagu ♫' : 'Jeda musik Ⅱ'; toggle.setAttribute('aria-label',soundtrack.paused ? 'Putar musik' : 'Jeda musik'); };
+    soundtrack.addEventListener('play',update); soundtrack.addEventListener('pause',update);
+    toggle.onclick = () => {
+      if (!soundtrack.paused) soundtrack.pause();
+      else playMusic();
+    };
+  }
+  playMusic();
+}
+function playMusic() {
+  document.querySelector('#music-status').textContent = '';
+  soundtrack.play().catch(() => {document.querySelector('#music-status').textContent = 'Ketuk Putar lagu untuk mencoba lagi.';});
+}
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const recipientView = new URLSearchParams(location.search).get('view') === 'recipient';
 const banner = () => data?.admin && !recipientView ? '<p class="preview-banner">Pratinjau pribadi · <a href="/?view=recipient">POV Nabila</a> · <a href="/admin">Edit kartu</a></p>' : '';
@@ -37,7 +59,7 @@ function show(step = 0) {
       document.querySelector('#bloom').textContent = 'Tambah bunga lagi? 🌼';
     };
   }
-  const next = document.querySelector('#next'); if (next) next.onclick = () => { show(step+1); window.scrollTo({top:0,behavior:'smooth'}); };
+  const next = document.querySelector('#next'); if (next) next.onclick = () => { if(step===0) startMusic(); show(step+1); window.scrollTo({top:0,behavior:'smooth'}); };
 }
 function locked(info) {
   const offset = info.serverNow - Date.now();
