@@ -74,6 +74,10 @@ function show(step = 0) {
     root.innerHTML = banner() + `<section class="paper game-page"><p class="eyebrow">MISI 01 · TOKO BUNGA MINI</p><h1>Rakit buketmu 🌷</h1><p class="muted">Cari 6 bunga di kebun ini. Awan boleh diketuk juga, tapi nggak bisa masuk vas. 🤭</p><p id="game-score" class="game-score" role="status">Buket: 0 / 6 bunga</p><div class="flower-game" aria-label="Kebun bunga"></div><p id="game-feedback" class="game-feedback" role="status">Nggak pakai timer. Santai, ini ulang tahun, bukan ujian.</p><button class="secondary" id="reset-game">Acak kebunnya ↻</button><button id="next">Lanjut ke tebak-tebakan ✨</button></section>`;
     const reset = () => {
       let score = 0;
+      const pickedFlowers = [];
+      document.querySelector('#crafted-bouquet')?.remove();
+      const result = document.createElement('div'); result.id='crafted-bouquet'; result.className='crafted-result'; result.hidden=true;
+      document.querySelector('.flower-game').after(result);
       document.querySelector('#game-score').textContent = 'Buket: 0 / 6 bunga';
       document.querySelector('#game-feedback').textContent = 'Nggak pakai timer. Santai, ini ulang tahun, bukan ujian.';
       const tiles = ['🌷','🌸','🌼','🌻','🌺','🌹','☁️','☁️','☁️','☁️','☁️','☁️'];
@@ -82,7 +86,9 @@ function show(step = 0) {
       grid.innerHTML = tiles.map((tile,i)=>`<button class="garden-tile" aria-label="${tile==='☁️'?'Awan':'Ambil bunga'} ${i+1}">${tile}</button>`).join('');
       grid.querySelectorAll('button').forEach((button,i)=> button.onclick = () => {
         if (tiles[i]==='☁️') { button.classList.remove('cloud-boop'); void button.offsetWidth; button.classList.add('cloud-boop'); document.querySelector('#game-feedback').textContent = 'Itu awan, hehe. Yang bikin melayang cukup obrolan kita aja. ☁️'; return; }
-        score++; button.disabled=true; button.classList.add('picked'); button.textContent='♡';
+        score++; pickedFlowers.push(tiles[i]); button.disabled=true; button.classList.add('picked'); button.textContent='♡';
+        result.hidden=false;
+        result.innerHTML=`<p class="eyebrow">${score===6?'BUKET RACIKANMU SUDAH JADI!':'BUKETMU MULAI MEKAR'}</p><div class="bouquet crafted-bouquet" role="img" aria-label="Buket pilihanmu: ${pickedFlowers.join(' ')}">${pickedFlowers.map((flower,j)=>`<span class="stem crafted-stem" style="--stem-angle:${[-40,-24,-8,8,24,40][j]}deg;--stem-height:${[145,170,185,185,170,145][j]}px"><i>${flower}</i></span>`).join('')}<span class="bouquet-wrap"></span><span class="bouquet-ribbon">♡</span></div><p class="crafted-caption">${score===6?'Enam bunga pilihanmu, dibungkus dengan sedikit niat dan banyak doa baik. Simpan senyumnya juga, ya. 🤭🌷':`${score} bunga sudah masuk buket. Pilih lagi untuk melengkapinya 🌸`}</p>`;
         document.querySelector('#game-score').textContent=`Buket: ${score} / 6 bunga`;
         document.querySelector('#game-feedback').textContent = score===6 ? 'Buket lengkap! Bunganya cantik. Tapi yang ngerakit juga nggak kalah. 🤭🌷' : 'Satu bunga lagi buat hari yang lebih manis 🌸';
         if (score===6) confetti();
