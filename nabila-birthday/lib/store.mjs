@@ -16,7 +16,8 @@ export async function readCard() {
     const value = await redis(['GET', key]);
     return value ? JSON.parse(value) : initialCard;
   }
-  if (process.env.VERCEL) throw new Error('Penyimpanan online belum terhubung.');
+  // The deployed card remains readable even before online editing is configured.
+  if (process.env.VERCEL) return initialCard;
   try { return JSON.parse(await readFile('.local/card.json', 'utf8')); }
   catch (e) { if (e.code === 'ENOENT') return initialCard; throw e; }
 }
