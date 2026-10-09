@@ -6,7 +6,7 @@ function startMusic() {
     soundtrack = new Audio('/api/music');
     soundtrack.loop = true; soundtrack.volume = 0.35; soundtrack.preload = 'none';
     const controls = document.createElement('div'); controls.className = 'music-controls';
-    controls.innerHTML = '<span>♫ From The Start · Good Kid</span><button type="button" id="music-toggle" aria-label="Putar musik">Putar lagu ♫</button><span id="music-status" class="music-status" role="status"></span>';
+    controls.innerHTML = '<span>♫ From The Start · Laufey</span><button type="button" id="music-toggle" aria-label="Putar musik">Putar lagu ♫</button><span id="music-status" class="music-status" role="status"></span>';
     document.body.append(controls);
     const toggle = controls.querySelector('button');
     const update = () => { toggle.textContent = soundtrack.paused ? 'Putar lagu ♫' : 'Jeda musik Ⅱ'; toggle.setAttribute('aria-label',soundtrack.paused ? 'Putar musik' : 'Jeda musik'); };
