@@ -70,6 +70,50 @@ function show(step = 0) {
     root.innerHTML = banner() + `<section class="paper letter-paper"><div class="letter-flowers" aria-hidden="true">🌷 🌸 🌼</div><p class="eyebrow">SEBUAH SURAT KECIL UNTUKMU</p><h2>Dear ${escape(c.name)}, ♡</h2><p class="letter">${escape(c.message)}</p><p class="signature">${escape(c.sender)}</p><button id="next">Masih ada bunga buatmu 🌷</button></section>`;
   } else if (step === 3) {
     root.innerHTML = banner() + `<section class="scrapbook"><p class="eyebrow">SOME LITTLE THINGS ABOUT YOU</p><span class="sticker">bukti kalau kamu & bunga itu satu tema ♡</span><h1>Enam foto,<br><em>banyak senyum.</em></h1><p class="muted">Album kecil buat tokoh utama hari ini.<br>Geser ke bawah, ada versi gemesnya juga. 🤭</p>${album()}<p class="album-note">PS: bunga boleh layu, foto-foto ini jangan. 🌷</p><button id="next">Sekarang, bunga buatmu 🌸</button></section>`;
+  } else if (step === 4) {
+    root.innerHTML = banner() + `<section class="paper game-page"><p class="eyebrow">MISI 01 · TOKO BUNGA MINI</p><h1>Rakit buketmu 🌷</h1><p class="muted">Cari 6 bunga di kebun ini. Awan boleh diketuk juga, tapi nggak bisa masuk vas. 🤭</p><p id="game-score" class="game-score" role="status">Buket: 0 / 6 bunga</p><div class="flower-game" aria-label="Kebun bunga"></div><p id="game-feedback" class="game-feedback" role="status">Nggak pakai timer. Santai, ini ulang tahun, bukan ujian.</p><button class="secondary" id="reset-game">Acak kebunnya ↻</button><button id="next">Lanjut ke tebak-tebakan ✨</button></section>`;
+    const reset = () => {
+      let score = 0;
+      document.querySelector('#game-score').textContent = 'Buket: 0 / 6 bunga';
+      document.querySelector('#game-feedback').textContent = 'Nggak pakai timer. Santai, ini ulang tahun, bukan ujian.';
+      const tiles = ['🌷','🌸','🌼','🌻','🌺','🌹','☁️','☁️','☁️','☁️','☁️','☁️'];
+      for (let i=tiles.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [tiles[i],tiles[j]]=[tiles[j],tiles[i]]; }
+      const grid = document.querySelector('.flower-game');
+      grid.innerHTML = tiles.map((tile,i)=>`<button class="garden-tile" aria-label="${tile==='☁️'?'Awan':'Ambil bunga'} ${i+1}">${tile}</button>`).join('');
+      grid.querySelectorAll('button').forEach((button,i)=> button.onclick = () => {
+        if (tiles[i]==='☁️') { button.classList.remove('cloud-boop'); void button.offsetWidth; button.classList.add('cloud-boop'); document.querySelector('#game-feedback').textContent = 'Itu awan, hehe. Yang bikin melayang cukup obrolan kita aja. ☁️'; return; }
+        score++; button.disabled=true; button.classList.add('picked'); button.textContent='♡';
+        document.querySelector('#game-score').textContent=`Buket: ${score} / 6 bunga`;
+        document.querySelector('#game-feedback').textContent = score===6 ? 'Buket lengkap! Bunganya cantik. Tapi yang ngerakit juga nggak kalah. 🤭🌷' : 'Satu bunga lagi buat hari yang lebih manis 🌸';
+        if (score===6) confetti();
+      });
+    };
+    reset(); document.querySelector('#reset-game').onclick=reset;
+  } else if (step === 5) {
+    root.innerHTML = banner() + `<section class="paper game-page"><p class="eyebrow">MISI 02 · KUIS RECEH</p><h1>Tebak dulu,<br><em>senyum kemudian.</em></h1><p class="muted">Tiga soal. Jawaban salah tetap dapat ucapan ulang tahun, kok.</p><div id="quiz-box"></div><p id="quiz-feedback" class="game-feedback" role="status"></p><button id="quiz-next" hidden>Soal berikutnya 🌼</button><button id="next" class="secondary">Lanjut ke kejutan kecil 💌</button></section>`;
+    const questions = [
+      ['Kenapa bunga di kartu ini nggak layu?', ['Karena virtual','Karena rajin olahraga','Karena minum kopi'],0,'Betul, virtual! Tapi niat bikinnya beneran kok. 🌷'],
+      ['Apa yang paling sering bikin aku cek HP?', ['Ramalan cuaca','Notifikasi kamu','Promo panci'],1,'Notifikasi kamu. Promo panci belum bisa diajak ngobrol seru, soalnya. 🤭'],
+      ['Hadiah paling cocok buat hari ini?', ['Tugas tambahan','Alarm jam lima','Bunga + doa baik'],2,'Bunga dan doa baik. Bonus: seseorang yang senang bisa kenal kamu. 🌸']
+    ];
+    let question=0, points=0;
+    const renderQuestion = () => {
+      const [title,choices,answer,reply]=questions[question];
+      document.querySelector('#quiz-box').innerHTML=`<p class="tiny-note">Soal ${question+1} dari 3</p><h2 class="quiz-title">${title}</h2><div class="quiz-choices">${choices.map((text,i)=>`<button class="secondary" data-answer="${i}">${text}</button>`).join('')}</div>`;
+      document.querySelector('#quiz-feedback').textContent=''; document.querySelector('#quiz-next').hidden=true;
+      document.querySelectorAll('[data-answer]').forEach(button => button.onclick=()=>{
+        const correct=Number(button.dataset.answer)===answer; if(correct)points++;
+        document.querySelectorAll('[data-answer]').forEach(b=>{b.disabled=true;if(Number(b.dataset.answer)===answer)b.classList.add('correct-answer');});
+        document.querySelector('#quiz-feedback').textContent=(correct?'✨ ':'Hehe, jawabannya: ')+reply+(question===2?` Skor ${points}/3. Hadiahnya tetap sama: semoga kamu bahagia!`: '');
+        document.querySelector('#quiz-next').hidden=question===2;
+        if(question===2)confetti();
+      });
+    };
+    renderQuestion(); document.querySelector('#quiz-next').onclick=()=>{question++;renderQuestion();};
+  } else if (step === 6) {
+    const notes = ['Kamu tuh kayak lagu favorit. Ngobrolnya sudah selesai, tapi masih kepikiran. 🎶','Bunga di sini ada enam macam. Tapi alasan aku senyum waktu buka chat, biasanya satu. 🤭','Aku nggak jago merangkai bunga. Jadi aku rangkai website dulu. Lumayan, niatnya kelihatan kan? 🌷'];
+    root.innerHTML=banner()+`<section class="paper game-page"><p class="eyebrow">TIGA PESAN · SEDIKIT DEG-DEGAN</p><h1>Buka pelan-pelan 💌</h1><p class="muted">Isinya agak receh. Kalau senyum, anggap aja efek bunganya.</p><div class="little-notes">${notes.map((note,i)=>`<button class="note-card" aria-expanded="false"><span class="note-icon" aria-hidden="true">${['🌷','♡','💌'][i]}</span><span class="note-label">Buka pesan ${i+1}</span><span class="note-content" hidden>${escape(note)}</span></button>`).join('')}</div><button id="next">Sekarang, buat satu harapan 🌼</button></section>`;
+    document.querySelectorAll('.note-card').forEach(button=>button.onclick=()=>{ const opened=button.getAttribute('aria-expanded')==='true'; button.setAttribute('aria-expanded',String(!opened));button.querySelector('.note-content').hidden=opened;button.querySelector('.note-label').textContent=opened?`Buka pesan ${Array.from(button.parentNode.children).indexOf(button)+1}`:'Tutup pesan'; });
   } else {
     root.innerHTML = banner() + `<section><p class="eyebrow">SEDIKIT BUNGA, BANYAK DOA BAIK</p>${bouquet()}<h1>Make a wish,<br><em>${escape(c.name)}.</em></h1><p class="letter centered">${escape(c.wish)}</p><button id="bloom">Terima bunganya 🌸</button><p id="bloom-message" class="muted bloom-message" role="status"></p><p class="signature">${escape(c.sender)}</p><button class="secondary" id="again">Baca lagi ↻</button></section>`;
     confetti(); document.querySelector('#again').onclick = () => show(0);
@@ -78,6 +122,11 @@ function show(step = 0) {
       document.querySelector('#bloom-message').textContent = 'Bunga berhasil diterima! Sekarang senyum dulu, biar bunganya nggak minder. 🤭♡';
       document.querySelector('#bloom').textContent = 'Tambah bunga lagi? 🌼';
     };
+  }
+  const stageNames=['Paket kecil','Ulang tahun','Surat','Album foto','Kebun bunga','Kuis receh','Pesan kecil','Harapan'];
+  root.querySelector('section').insertAdjacentHTML('afterbegin',`<p class="chapter-count">${step+1} / 8 · ${stageNames[step]}</p>`);
+  if(step>0) {
+    const back=document.createElement('button');back.className='secondary chapter-back';back.textContent='← Halaman sebelumnya';back.onclick=()=>{show(step-1);window.scrollTo({top:0,behavior:'instant'});};root.querySelector('section').append(back);
   }
   animateCard();
   const next = document.querySelector('#next'); if (next) next.onclick = () => { if(step===0) startMusic(); show(step+1); window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); };
