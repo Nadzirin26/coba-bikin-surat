@@ -28,6 +28,26 @@ const banner = () => data?.admin && !recipientView ? '<p class="preview-banner">
 const bouquet = () => '<div class="bouquet" aria-hidden="true"><span class="stem flower-one"><i>🌸</i></span><span class="stem flower-two"><i>🌼</i></span><span class="stem flower-three"><i>🌷</i></span><span class="stem flower-four"><i>🌸</i></span><span class="stem flower-five"><i>🌼</i></span><span class="bouquet-wrap"></span><span class="bouquet-ribbon">♡</span></div>';
 const photoCaptions = ['senyum dulu, bunganya lihat nih ♡', 'empat pose, tetap gemes semua 🤭', 'tim beruang juga ikut ngucapin 🧸', 'bunga kuning & hari yang manis 🌼', 'sibuk sebentar, cute-nya tetap jalan ✨', 'bunganya banyak, tokoh utamanya satu 🌷'];
 const album = () => `<div class="photo-grid">${photoCaptions.map((caption,i) => `<figure class="polaroid photo-${i+1}"><span class="photo-tape" aria-hidden="true"></span><div class="photo-window ${i===1||i===2 ? 'screenshot-photo' : ''}"><img src="/api/photo?id=${i+1}" alt="Foto Nabila ${i+1}" loading="lazy" decoding="async" width="490" height="712"></div><figcaption>${caption}</figcaption><span class="photo-flower" aria-hidden="true">${['🌸','♡','🌼','🌷','♡','🌸'][i]}</span></figure>`).join('')}</div>`;
+let revealObserver;
+function animateCard() {
+  revealObserver?.disconnect();
+  const letter = root.querySelector('.letter-paper .letter');
+  if (letter) letter.innerHTML = letter.textContent.split(/\n\s*\n/).map(text => `<span class="letter-paragraph">${escape(text)}</span>`).join('');
+  const flowers = root.querySelector('.letter-flowers');
+  if (flowers) flowers.innerHTML = ['🌷','🌸','🌼'].map(f => `<span>${f}</span>`).join(' ');
+  if (!document.querySelector('.floating-garden')) {
+    const garden = document.createElement('div'); garden.className = 'floating-garden'; garden.setAttribute('aria-hidden','true');
+    garden.innerHTML = Array.from({length:12},(_,i) => `<span style="--x:${4+i*8}%;--duration:${12+i%4*3}s;--delay:-${i*2}s">${['♡','✿','🌸','♡','✨','🌼'][i%6]}</span>`).join('');
+    document.body.prepend(garden);
+  }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('revealed'); revealObserver.unobserve(entry.target); }
+  }), {threshold:0.08});
+  root.querySelectorAll('.letter-paragraph,.polaroid').forEach((el,i) => {
+    el.classList.add('reveal-item'); el.style.setProperty('--reveal-delay',`${i%2*120}ms`); revealObserver.observe(el);
+  });
+}
 function confetti() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for (let i = 0; i < 42; i++) {
@@ -59,7 +79,8 @@ function show(step = 0) {
       document.querySelector('#bloom').textContent = 'Tambah bunga lagi? 🌼';
     };
   }
-  const next = document.querySelector('#next'); if (next) next.onclick = () => { if(step===0) startMusic(); show(step+1); window.scrollTo({top:0,behavior:'smooth'}); };
+  animateCard();
+  const next = document.querySelector('#next'); if (next) next.onclick = () => { if(step===0) startMusic(); show(step+1); window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); };
 }
 function locked(info) {
   const offset = info.serverNow - Date.now();
