@@ -1,5 +1,6 @@
 const root = document.querySelector('#root');
 let data, countdownInterval, retryTimer;
+let waitingForBirthday = false, enteringCard = false;
 let soundtrack;
 function startMusic() {
   if (!soundtrack) {
@@ -138,6 +139,7 @@ function show(step = 0) {
   const next = document.querySelector('#next'); if (next) next.onclick = () => { if(step===0) startMusic(); show(step+1); window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); };
 }
 function locked(info) {
+  waitingForBirthday = true;
   const offset = info.serverNow - Date.now();
   root.innerHTML = '<section><p class="eyebrow">SEBUAH KEJUTAN KECIL</p><div class="envelope" aria-hidden="true"></div><h1>Yang indah,<br>layak ditunggu.</h1><p class="muted">Ada hadiah kecil yang menunggu hari istimewamu.<br>Simpan tautan ini, ya. ♡</p><div class="countdown" aria-label="Hitung mundur"><div><strong id="days">–</strong><small>hari</small></div><div><strong id="hours">–</strong><small>jam</small></div><div><strong id="minutes">–</strong><small>menit</small></div><div><strong id="seconds">–</strong><small>detik</small></div></div><p class="date">10 Oktober 2026 · 00.00 WIB</p></section>';
   const tick = () => {
@@ -149,13 +151,37 @@ function locked(info) {
   // Periodically resync with the server, including if the device clock changes.
   if (!retryTimer) retryTimer = setTimeout(load,60000);
 }
+async function enterBirthdayCard() {
+  if (enteringCard) return;
+  enteringCard = true;
+  const envelope = root.querySelector('.envelope');
+  if (envelope && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const overlay = document.createElement('div');
+    overlay.className = 'birthday-entry'; overlay.setAttribute('aria-hidden','true');
+    overlay.innerHTML = '<div class="envelope"></div><p>Sudah waktunya… kejutanmu siap dibuka 🌷</p>';
+    document.body.append(overlay);
+    root.setAttribute('aria-busy','true');
+    const animation = overlay.querySelector('.envelope').animate([
+      {transform:'rotate(-5deg) scale(1)',opacity:1},
+      {transform:'rotate(0deg) scale(1.25)',opacity:1,offset:.45},
+      {transform:'rotate(0deg) scale(7)',opacity:0}
+    ],{duration:1800,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
+    await animation.finished;
+    show(); root.removeAttribute('aria-busy');
+    overlay.classList.add('entry-finished');
+    setTimeout(()=>overlay.remove(),500);
+  } else show();
+  waitingForBirthday = false; enteringCard = false;
+}
 async function load() {
   clearInterval(countdownInterval); clearTimeout(retryTimer); retryTimer = null;
   try {
     const response = await fetch('/api/card', { cache:'no-store' }); const info = await response.json();
     if (response.status === 423) return locked(info);
     if (!response.ok) throw new Error(info.error || 'Kartu belum bisa dibuka.');
-    data = info; show();
+    data = info;
+    if (waitingForBirthday) await enterBirthdayCard();
+    else show();
   } catch {
     root.innerHTML = '<div class="seal">♡</div><h1>Sebentar, ya.</h1><p class="muted">Kartu belum bisa dimuat. Coba lagi sebentar.</p><button id="retry">Coba lagi</button>';
     document.querySelector('#retry').onclick = load;
